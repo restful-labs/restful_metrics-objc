@@ -20,9 +20,12 @@ the API in a simple demo app.
 ``` objective-c
     #include <RestfulMetrics.h>
 
-    - (void) sendSingleMetric
+    - (void) sendSomeExampleMetrics
     {
-        RestfulMetrics *rm = [[RestfulMetrics alloc] initWithAppName:@"my-great-app" apiKey:@"1234567..."];
+        RestfulMetrics *rm =
+            [[RestfulMetrics alloc]
+                initWithAppName:@"my-great-app"
+                apiKey:@"1234567..."];
 
         // Send a data point.
         [rm addMetric:@"example_event1"];
@@ -51,6 +54,9 @@ the API in a simple demo app.
         [rm addCompoundMetric:@"example_event8" values:values8 identifier:@"session-8"];
     }
 ```
+
+In most cases, you will want to instantiate the RestfulMetrics object once and
+use one instance per thread.
 
 ## Copyright
 
