@@ -111,7 +111,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastUpgradeCheck = 0440;
-				ORGANIZATIONNAME = "Gemini SBS";
+				ORGANIZATIONNAME = "RESTful Labs";
 			};
 			buildConfigurationList = 74ACDDCD14F7E109008B01F6 /* Build configuration list for PBXProject "RestfulMetrics" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -227,6 +227,7 @@
 				74ACDDE214F7E109008B01F6 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

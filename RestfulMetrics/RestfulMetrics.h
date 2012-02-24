@@ -6,7 +6,6 @@
 @property (strong) NSString *apiKey;
 @property (strong) NSURL *metricUrl;
 @property (strong) NSURL *compoundUrl;
-@property (strong) NSMutableDictionary *connections;
 
 - (id) initWithAppName:(NSString *)appName apiKey:(NSString *)apiKey;
 

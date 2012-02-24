@@ -15,7 +15,6 @@
     if (self = [self init]) {
         self.appName = myAppName;
         self.apiKey = myApiKey;
-        self.connections = [NSMutableDictionary dictionary];
         
         format = @"http://track.restfulmetrics.com/apps/%@/metrics.json";
         url = [NSString stringWithFormat:format, myAppName];
@@ -51,37 +50,36 @@
 - (BOOL) addMetric:(NSString *)name count:(NSInteger)count identifier:(NSString *)identifier
 {
     NSMutableURLRequest *request =
-    [[NSMutableURLRequest alloc]
-     initWithURL:self.metricUrl];
+        [[NSMutableURLRequest alloc]
+             initWithURL:self.metricUrl];
     
     NSDictionary *metric =
-    [NSDictionary dictionaryWithObjectsAndKeys:        
-     appName, @"name",
-     [NSNumber numberWithInt:count], @"value",
-     identifier, @"distinct_id",
-     nil];
+        [NSDictionary dictionaryWithObjectsAndKeys:        
+             name, @"name",
+             [NSNumber numberWithInt:count], @"value",
+             identifier, @"distinct_id",
+             nil];
     
     NSDictionary *bodyDict =
-    [NSDictionary
-     dictionaryWithObject:metric
-     forKey:@"compound_metric"];
+        [NSDictionary
+             dictionaryWithObject:metric
+             forKey:@"metric"];
     
     NSString *bodyString =
-    [self objectToJson:bodyDict];
+        [self objectToJson:bodyDict];
     
     NSData *bodyData =
-    [bodyString dataUsingEncoding:NSUTF8StringEncoding];
+        [bodyString dataUsingEncoding:NSUTF8StringEncoding];
     
     [request setHTTPBody:bodyData];
     [request setHTTPMethod:@"POST"];
     [request setValue:self.apiKey forHTTPHeaderField:@"Authorization"];
+    [request setValue:@"application/json; charset=utf-8" forHTTPHeaderField:@"Content-Type"];
     
     NSURLConnection *connection =
-    [NSURLConnection
-     connectionWithRequest:request
-     delegate:self];
-    
-    [self.connections setObject:request forKey:connection];
+        [NSURLConnection
+             connectionWithRequest:request
+             delegate:self];
     
     return connection != nil;
 }
@@ -108,37 +106,36 @@
 - (BOOL)addCompoundMetric:(NSString *)name values:(NSArray *)values identifier:(NSString *)identifier
 {
     NSMutableURLRequest *request =
-    [[NSMutableURLRequest alloc]
-     initWithURL:self.metricUrl];
+        [[NSMutableURLRequest alloc]
+             initWithURL:self.compoundUrl];
     
     NSDictionary *metric =
-    [NSDictionary dictionaryWithObjectsAndKeys:        
-     appName, @"name",
-     values, @"values",
-     identifier, @"distinct_id",
-     nil];
+        [NSDictionary dictionaryWithObjectsAndKeys:        
+             name, @"name",
+             values, @"values",
+             identifier, @"distinct_id",
+             nil];
     
     NSDictionary *bodyDict =
-    [NSDictionary
-     dictionaryWithObject:metric
-     forKey:@"compound_metric"];
+        [NSDictionary
+             dictionaryWithObject:metric
+             forKey:@"compound_metric"];
     
     NSString *bodyString =
-    [self objectToJson:bodyDict];
+        [self objectToJson:bodyDict];
     
     NSData *bodyData =
-    [bodyString dataUsingEncoding:NSUTF8StringEncoding];
+        [bodyString dataUsingEncoding:NSUTF8StringEncoding];
     
     [request setHTTPBody:bodyData];
     [request setHTTPMethod:@"POST"];
     [request setValue:self.apiKey forHTTPHeaderField:@"Authorization"];
+    [request setValue:@"application/json; charset=utf-8" forHTTPHeaderField:@"Content-Type"];
     
     NSURLConnection *connection =
-    [NSURLConnection
-     connectionWithRequest:request
-     delegate:self];
-    
-    [self.connections setObject:request forKey:connection];
+        [NSURLConnection
+             connectionWithRequest:request
+             delegate:self];
     
     return connection != nil;    
 }
@@ -149,27 +146,12 @@
 
 - (void) connection:(NSURLConnection *)connection didFailWithError:(NSError *)error
 {
-    // Connection failed, retry after 1 minute.
-    
-    NSURLRequest *request = [self.connections objectForKey:connection];
-    
-    if (request != nil) {
-        [NSTimer
-         scheduledTimerWithTimeInterval:60
-         target:self
-         selector:@selector(retryRequest:)
-         userInfo:request
-         repeats:NO];
-        
-        [self.connections removeObjectForKey:connection];
-    }
+    // Connection failed.
 }
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection
 {
     // Connection succeeded.
-    
-    [self.connections removeObjectForKey:connection];
 }
 
 
@@ -220,15 +202,6 @@
     NSString *joinedArray = [encodedArray componentsJoinedByString:@", "];
     
     return [NSString stringWithFormat:@"{%@}", joinedArray];
-}
-
-- (void) retryRequest:(NSTimer *)timer
-{
-    NSURLRequest *request = timer.userInfo;
-    
-    NSURLConnection *connection = [NSURLConnection connectionWithRequest:request delegate:self];
-    
-    [self.connections setObject:request forKey:connection];
 }
 
 
